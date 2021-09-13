@@ -6,8 +6,8 @@ use yii\queue\JobInterface;
 use zafarjonovich\Telegram\base\MethodOption;
 use zafarjonovich\Telegram\BotApi;
 use zafarjonovich\Telegram\update\objects\Response;
-use zafarjonovich\YiiTelegramQueue\interfaces\AfterExecuteEventInterface;
-use zafarjonovich\YiiTelegramQueue\interfaces\BeforeExecuteEventInterface;
+use zafarjonovich\YiiTelegramQueue\interfaces\AfterExecutable;
+use zafarjonovich\YiiTelegramQueue\interfaces\BeforeExecutable;
 
 class MessageQueue implements JobInterface
 {
@@ -53,24 +53,24 @@ class MessageQueue implements JobInterface
         return $this;
     }
 
-    private function runBeforeExecuteEvents()
+    private function runBeforeExecutableEvents()
     {
         foreach ($this->beforeExecuteEvents as $event) {
             $object = \Yii::createObject($event);
 
-            if(!($object instanceof BeforeExecuteEventInterface))
+            if(!($object instanceof BeforeExecutable))
                 throw new \Exception('Invalid configuration');
 
             $object->run($this);
         }
     }
 
-    private function runAfterExecuteEvents(BotApi $botApi,Response $response)
+    private function runAfterExecutableEvents(BotApi $botApi,Response $response)
     {
         foreach ($this->afterExecuteEvents as $afterExecuteEvent) {
             $object = \Yii::createObject($afterExecuteEvent);
 
-            if(!($object instanceof AfterExecuteEventInterface))
+            if(!($object instanceof AfterExecutable))
                 throw new \Exception('Invalid configuration');
 
             $object->run($botApi,$response);
@@ -81,10 +81,10 @@ class MessageQueue implements JobInterface
     {
         $botApi = new BotApi($this->botToken);
 
-        $this->runBeforeExecuteEvents();
+        $this->runBeforeExecutableEvents();
 
         $response = $botApi->query($this->botMethod,$this->botMethodOptions->toArray());
 
-        $this->runAfterExecuteEvents($botApi,new Response($response));
+        $this->runAfterExecutableEvents($botApi,new Response($response));
     }
 }
