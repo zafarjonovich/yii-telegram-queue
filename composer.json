@@ -5,8 +5,7 @@
   "require": {
     "php": ">=7.0",
     "ext-json": "*",
-    "zafarjonovich/yii-telegram-queue": "*",
-    "zafarjonovich/telegram": ">=2.4.5"
+    "zafarjonovich/telegram": "*"
   },
   "autoload": {
     "psr-4": {
